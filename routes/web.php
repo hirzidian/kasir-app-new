@@ -1,66 +1,71 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
-use Illuminate\Auth\Events\LogOut;
-use Illuminate\Support\Facades\Route;
 
-
-Route::middleware('guest')->group(function(){
+// Guest Routes
+Route::middleware('guest')->group(function () {
     Route::get('login', [AuthController::class, 'index'])->name('login');
     Route::post('auth', [AuthController::class, 'authProccess'])->name('authProccess');
 });
 
-Route::middleware('auth')->group(function(){
-    //Logout
+// Authenticated Routes
+Route::middleware('auth')->group(function () {
+
+    // Logout
     Route::get('logout', [AuthController::class, 'logOut'])->name('logout');
-    //Dashboard
+
+    // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard.index');
-    //User
-    Route::get('users', [UserController::class, 'index'])->name('users.index');
-    Route::get('users/create', [UserController::class, 'create'])->name('users.create');
-    Route::post('users/store', [UserController::class, 'store'])->name('users.store');
-    Route::get('users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
-    Route::put('users/{id}', [UserController::class, 'update'])->name('users.update');
-    Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
-    //Product
-    Route::get('products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
-    Route::post('products/store', [ProductController::class, 'store'])->name('products.store');
-    Route::get('products/{id}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    Route::put('products/{id}', [ProductController::class, 'update'])->name('products.update');
-    Route::delete('products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
-    //Purchases
-    Route::get('purchases', [PurchaseController::class, 'index'])->name("purchases.index");
-    Route::get('purchases/product', [PurchaseController::class, 'product'])->name("purchases.product");
-    Route::post('purchases/create', [PurchaseController::class, 'create'])->name("purchases.create");
-    Route::post('purchases/store', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('purchases/invoice/{id}', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
-    Route::get('purchases/create', [PurchaseController::class, 'storeSales'])->name("purchases.storeSales");
-    Route::get('purchases/member/{id}', [PurchaseController::class, 'updateSales'])->name("purchases.member");
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.duplicate');
 
-    Route::get('/purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/purchases/store', [PurchaseController::class, 'store'])->name('purchases.store');
-    Route::get('/purchases/sale/member', [PurchaseController::class, 'storeSales'])->name('purchases.sale.member');
-    Route::get('/purchases/invoice/{id}', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
+    // User 
+    Route::prefix('users')->name('users.')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('index');
+        Route::get('/create', [UserController::class, 'create'])->name('create');
+        Route::post('/store', [UserController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [UserController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [UserController::class, 'update'])->name('update');
+        Route::delete('/{id}', [UserController::class, 'destroy'])->name('destroy');
+    });
 
-    // Route::get('purchases', [PurchaseController::class, 'index'])->name("purchases.index");
+    // Product 
+    Route::prefix('products')->name('products.')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::get('/create', [ProductController::class, 'create'])->name('create');
+        Route::post('/store', [ProductController::class, 'store'])->name('store');
+        Route::get('/{id}/edit', [ProductController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ProductController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ProductController::class, 'destroy'])->name('destroy');
+    });
 
-    // // Routes untuk produk
-    // Route::get('purchases/product', [PurchaseController::class, 'product'])->name("purchases.product");
+    // Transactions
+    Route::prefix('transactions')->name('transactions.')->group(function () {
+        Route::get('/', [TransactionController::class, 'index'])->name('index');
+        Route::get('/show', [TransactionController::class, 'show'])->name('show');
+        Route::get('/create', [TransactionController::class, 'create'])->name('create');
+        Route::post('/create', [TransactionController::class, 'store'])->name('store');
 
-    // // Routes untuk halaman create dan proses pemilihan member
-    // Route::get('purchases/create', [PurchaseController::class, 'create'])->name('purchases.create');
-    // Route::post('purchases/create', [PurchaseController::class, 'store'])->name('purchases.store');
+        // Sales
+        Route::post('/sale/create', [TransactionController::class, 'storeSales'])->name('sale.store');
+        Route::get('/sale/member/{id}', [TransactionController::class, 'updateSales'])->name('sale.member');
+        Route::post('/sale/detail-print/{id}', [TransactionController::class, 'printdetailStore'])->name('sale.detail.store');
+        Route::get('/sale/detail-print/{id}', [TransactionController::class, 'printDetail'])->name('sale.print');
+    });
 
-    // // Routes untuk proses pembayaran dan invoice
-    // Route::get('purchases/invoice/{id}', [PurchaseController::class, 'invoice'])->name('purchases.invoice');
+    // PDF Export
+    Route::prefix('print')->name('pdf.')->group(function () {
+        Route::get('/{id}', [TransactionController::class, 'pdf'])->name('print');
+    });
 
-    // // Route untuk proses member (saat memilih member)
-    // Route::get('purchases/member/{id}', [PurchaseController::class, 'updateSales'])->name("purchases.member");
-    // Route::get('/purchases/sale/member/{id}', [PurchaseController::class, 'storeSales'])->name('purchases.sale.member');
+    // Excel Export
+    Route::prefix('excel')->name('excel.')->group(function () {
+        Route::get('/transactions', [TransactionController::class, 'excel'])->name('print');
+    });
+
 });
-

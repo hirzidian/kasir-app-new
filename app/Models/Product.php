@@ -16,6 +16,6 @@ class Product extends Model
     //Relasi : Satu Product bisa muncul di banyak Purchase
     public function purchase()
     {
-        return $this->hasMany(Purchase::class);
+        return $this->hasMany(Transaction::class, 'product_id');
     }
 }

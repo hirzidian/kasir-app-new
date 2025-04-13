@@ -8,7 +8,7 @@
         <div class="table-responsive">
             <div class="card-header d-flex justify-content-between align-items-center">
                 @if (Auth::user()->role == 'admin')
-                    <a href="{{ route('products.create') }}" class="btn btn-info">Create Product</a>
+                    <a href="{{ route('products.create') }}" class="btn btn-info">Buat Product</a>
                 @endif
             {{-- Search --}}
                 <form action="{{ route('products.index') }}" method="GET" class="d-flex">
@@ -16,10 +16,10 @@
                         type="text" 
                         name="search" 
                         class="form-control me-2" 
-                        placeholder="Search product..." 
+                        placeholder="Cari product..." 
                         value="{{ request('search') }}">
                     <button type="
-                    " class="btn btn-secondary">Search</button>
+                    " class="btn btn-secondary">Cari</button>
                 </form>
             </div>
             {{-- Table --}}

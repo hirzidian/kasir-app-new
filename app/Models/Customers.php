@@ -8,16 +8,15 @@ use Illuminate\Notifications\Notifiable;
 
 class Customers extends Model
 {
-    use HasFactory, Notifiable;
-
-    protected $fillable = [
+    protected $table = 'customers';
+    protected $fillable = 
+    [
         'name',
         'no_hp',
-        'point',
+        'total_point'
     ];
 
-    public function purchase() 
-    {
-        return $this->hasMany(Purchase::class);
+    public function transactions (){
+        return $this->hasMany(Transaction::class,'customer_id');
     }
 }

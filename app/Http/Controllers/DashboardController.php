@@ -1,64 +1,63 @@
 <?php
-
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Transaction;
+use App\Models\TransactionDetail;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return view('Page.Dashboard.index');
-    }
+        // Get the count of transactions today
+        $data['count'] = Transaction::whereDate('created_at', now())->count();
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        // Get the latest transaction date
+        $latestTransaction = Transaction::latest()->first();
+        $data['date'] = $latestTransaction ? dateDmy($latestTransaction->created_at) : '-';
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        // Get all transactions
+        $datas = Transaction::all();
+        $data['chartTransaction'] = [];
+        $data['chartProduct'] = [];
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        // Get all products
+        $products = Product::all();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $dateLast = null;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Prepare transaction chart data
+        foreach ($datas as $transaction) {
+            $date = dateYmd($transaction->created_at);
+            $dateDay = dateDmy($transaction->created_at);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            $count = Transaction::whereDate('created_at', $date)->count();
+            if (!$dateLast && $count != 0) {
+                $data['chartTransaction'][$transaction->id] = [
+                    'count' => $count,
+                    'date' => $dateDay,
+                ];
+            } elseif ($dateLast != $date && $count != 0) {
+                $data['chartTransaction'][$transaction->id] = [
+                    'count' => $count,
+                    'date' => $dateDay,
+                ];
+            }
+            $dateLast = dateYmd($transaction->created_at);
+        }
+
+        // Prepare product chart data
+        foreach ($products as $product) {
+            $productCount = TransactionDetail::where('product_id', $product->id)->count();
+            if ($productCount != 0) {
+                $data['chartProduct'][$product->id] = [
+                    'productName' => $product->name,
+                    'productCount' => $productCount
+                ];
+            }
+        }
+
+        return view('page.dashboard.index', $data);
     }
 }

@@ -22,13 +22,12 @@
                 </li>
                 <li class="sidebar-item">
                     <a class="sidebar-link waves-effect waves-dark {{ request()->is('Purchase*') ? 'active-link' : 'inactive-link' }}" 
-                        href="{{ route('purchases.index') }}"
+                        href="{{ route('transactions.index') }}"
                         aria-expanded="false">
                         <i class="mdi mdi-cart-outline"></i>
                         <span class="hide-menu">Purchase</span>
                     </a>
                 </li>
-
                 @if (Auth::user()->role == 'admin')
                 <li class="sidebar-item">
                     <a class="sidebar-link waves-effect waves-dark {{ request()->is('users*') ? 'active-link' : 'inactive-link' }}" 

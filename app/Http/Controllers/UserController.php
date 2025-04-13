@@ -26,51 +26,54 @@ class UserController extends Controller
         return view('Page.User.create');
     }
 
-    public function store(Request $request)
-    { 
-        $validate = $request->validate([
+    public function store(Request $r)
+{
+    // Validasi input
+    $request = $r->validate([
         'name' => 'required',
-        'role' => 'required',
         'email' => 'required|email|unique:users,email',
-        'password' => 'required',
-        ], 
-        [
-            'email.unique' => 'Email sudah terdaftar',
-        ]);
+        'role' => 'required',
+        'password' => 'required'
+    ]);
 
-        // Hash password
-        $validate['password'] = Hash::make($validate['password']);
-
-        // Simpan data
-        $user = User::create($validate);
-
-        if (!$user) {
-            return redirect()->back()->with('error', 'Gagal membuat user.');
-        }
-
-        return redirect()->route('users.index')->with('success', 'Success Create User');
+    // Cek apakah email sudah terdaftar
+    $existEmail = User::where('email', $r->email)->first();
+    if ($existEmail) {
+        return redirect()->back()->with('error', 'Email sudah terdaftar!');
     }
+
+    // Hash password sebelum disimpan
+    $request['password'] = Hash::make($r->password);
+
+    // Menyimpan user baru
+    User::create($request);
+
+    return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan!');
+}
+
+    
+    public function update(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'role' => 'required',
+        ]);
+    
+        $user = User::findOrFail($id);
+        $user->update($validated);
+    
+        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
+    }
+    
+
 
     public function edit(string $id)
     {
         $user = User::findOrFail($id);
         return view('Page.User.edit', compact('user'));
     }
-
-    public function update(Request $request, string $id)
-    {
-        $validated = $request->validate([
-        'name' => 'required',
-        'email' => 'required|email|unique:users,email,' . $id,
-        'role' => 'required',
-    ]);
-
-        $user = User::findOrFail($id);
-        $user->update($validated);
-
-        return redirect()->route('users.index')->with('success', 'User berhasil diperbarui.');
-    }
-
+    
     public function destroy(string $id)
     {
         $user = User::findOrFail($id);

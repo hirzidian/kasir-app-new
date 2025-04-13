@@ -7,16 +7,16 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <a 
                 href="{{ route('users.create') }}" 
-                class="mb-3 btn btn-info">Create User</a>
+                class="mb-3 btn btn-info">Buat User</a>
                 <form action="{{ route('users.index') }}" method="GET" class="d-flex">
                     <input 
                         type="text" 
                         name="search" 
                         class="form-control me-2" 
-                        placeholder="Search product..." 
+                        placeholder="Cari User..." 
                         value="{{ request('search') }}">
                     <button type="
-                    " class="btn btn-secondary">Search</button>
+                    " class="btn btn-secondary">Cari</button>
                 </form>
             </div>
             <div class="table-responsive">
@@ -46,7 +46,7 @@
                                             @method('DELETE')
                                             <button type="submit"
                                                 onclick="return confirm('Are you sure you want to delete this user?')"
-                                                class="btn btn-danger">Delete</button>
+                                                class="btn btn-danger">Hapus</button>
                                         </form>
                                     </div>
                                 </td>

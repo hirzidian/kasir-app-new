@@ -8,13 +8,13 @@
 <div class="card-body">
     <div class="mb-3 row text-start">
         <div class="col-auto">
-            <a href="{{ url('sale/export-excel') }}" class="btn btn-info">Export Penjualan (.xlsx)</a>
+            <a href="{{ route('excel.print') }}" class="btn btn-info">Export Penjualan (.xlsx)</a>
         </div>
     </div>
 
     @if (Auth::user()->role == 'petugas')
         <div class="col-auto text-end">
-            <a href="{{ route('purchases.product') }}" class="btn btn-primary">Tambah Penjualan</a>
+            <a href="{{ route('transactions.show') }}" class="btn btn-primary">Tambah Penjualan</a>
         </div>
     @endif
 
@@ -52,17 +52,17 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($purchases as $purchase)
+                @forelse ($transactions as $transaction)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $purchase->member ?? 'Non Member' }}</td>
-                    <td>{{ \Carbon\Carbon::parse($purchase->created_at)->format('d M Y') }}</td>
-                    <td>Rp. {{ number_format($purchase->total_price ?? $purchase->total, 0, ',', '.') }}</td>
-                    <td>{{ $purchase->user->name ?? 'Tidak Diketahui' }}</td>
+                    <td>{{ $transaction->customer ? $transaction->customer->name : 'NON-MEMBER' }}</td>
+                    <td>{{ \Carbon\Carbon::parse($transaction->created_at)->format('d M Y') }}</td>
+                    <td>Rp. {{ number_format($transaction->total_price ?? $transaction->total, 0, ',', '.') }}</td>
+                    <td>{{ $transaction->user->name ?? 'Tidak Diketahui' }}</td>
                     <td>
                         <div class="d-flex justify-content-around">
-                            <a href="{{ route('purchases.invoice', $purchase->id) }}" class="btn btn-warning">Lihat</a>
-                            <a href="{{ url('sale/detail-print/print/' . $purchase->id) }}" class="btn btn-info">Unduh Bukti</a>
+                            <a href="{{ route('transactions.sale.print', $transaction->id) }}" class="btn btn-warning">Lihat</a>
+                            <a href="{{ route('pdf.print', $transaction->id) }}" class="btn btn-info">Unduh Bukti</a>
                         </div>
                     </td>
                 </tr>

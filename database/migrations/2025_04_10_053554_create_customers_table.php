@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("name")->nullable();
             $table->string("no_hp");
-            $table->integer("point");
+            $table->integer('total_point')->nullable();
             $table->timestamps();
         });
     }
